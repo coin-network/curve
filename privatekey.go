@@ -7,7 +7,17 @@ import (
 )
 
 type PrivateKey ecdsa.PrivateKey
+// GenerateKey generate PublicKey/PrivateKey from KoblitzCurve
+func NewPrivateKey(koblitzcurve elliptic.Curve) (*PrivateKey, error) {
 
+  //privkeyCurve := new(ecdsa.PrivateKey)
+  privkeyCurve, err := ecdsa.GenerateKey(koblitzcurve, rand.Reader)
+
+	if err != nil {
+		return nil, err
+	}
+	return (*PrivateKey)(privkeyCurve), nil
+}
 // converts a Bitcoin private key to a 32-byte byte slice.
 func (priv *PrivateKey) ToBytes() (b []byte) {
   d := priv.D.Bytes()
