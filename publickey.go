@@ -6,12 +6,42 @@ import (
   "bytes"
   "crypto/sha256"
   "math/big"
+  "crypto/ecdsa"
 )
 
 type PublicKey ecdsa.PublicKey
 
 func isOdd(a *big.Int) bool {
 	return a.Bit(0) == 1
+}
+/* Decompress decompresses coordinate x and ylsb (y's least significant bit)
+and returns the value of y
+source: https://github.com/btcsuite/btcd/blob/807d344fe97072efdf38ac3df053e07f26187a4f/btcec/pubkey.go#L27 */
+func (curve *KoblitzCurve) Decompress(x *big.Int, ybit bool) (*big.Int, error) {
+  // TODO: This will probably only work for secp256k1 due to
+	// optimizations.
+
+	// Y = +-sqrt(x^3 + B)
+	x3 := new(big.Int).Mul(x, x)
+	x3.Mul(x3, x)
+	x3.Add(x3, curve.Params().B)
+
+	// now calculate sqrt mod p of x2 + B
+	// This code used to do a full sqrt based on tonelli/shanks,
+	// but this was replaced by the algorithms referenced in
+	// https://bitcointalk.org/index.php?topic=162805.msg1712294#msg1712294
+	y := new(big.Int).Exp(x3, curve.QPlus1Div4(), curve.Params().P)
+
+	if ybit != isOdd(y) {
+		y.Sub(curve.Params().P, y)
+	}
+	if ybit != isOdd(y) {
+		return nil, fmt.Errorf("ybit doesn't match oddness")
+	}
+
+  // TODO: It is necessary to verify with IsOnCurve(x, y) or ParsePubKey ?
+
+	return y, nil  // TODO return struct Point (x, y)
 }
 // converts a public key to an uncompressed address string.
 func (pub *PublicKey) ToAddressUncompressed() (address string) {
@@ -91,7 +121,7 @@ func (pub *PublicKey) ToBytesUncompressed() (b []byte) {
   return append([]byte{0x04}, append(padded_x, padded_y...)...)
 }
 // TODO: :NOTUSE: converts a byte slice (either with or without point compression) to a public key.
-func (pub *PublicKey) FromBytes(koblitzcurve curve.KoblitzCurve, b []byte) (err error) {
+func (pub *PublicKey) FromBytes(koblitzcurve *KoblitzCurve, b []byte) (err error) {
   /* See Certicom SEC1 2.3.4, pg. 11 */
 
   if len(b) < 33 {
@@ -108,10 +138,10 @@ func (pub *PublicKey) FromBytes(koblitzcurve curve.KoblitzCurve, b []byte) (err 
     // TODO: TEST
     pub.X = new(big.Int).SetBytes(b[1:33])
 
-    if uint(b[0]&0x1) == true {
-      ybit := true
-    }else{
-      ybit := false
+    ybit := false
+
+    if uint(b[0]&0x1) == 1 {
+      ybit = true
     }
 
     Y, err := koblitzcurve.Decompress(new(big.Int).SetBytes(b[1:33]), ybit)
@@ -133,7 +163,7 @@ func (pub *PublicKey) FromBytes(koblitzcurve curve.KoblitzCurve, b []byte) (err 
     pub.Y = new(big.Int).SetBytes(b[33:65])
 
     /* ??? Check that the point is on the curve */
-    if !elliptic.IsOnCurve(pub.X, pub.Y) {
+    if !koblitzcurve.IsOnCurve(pub.X, pub.Y) {
       return fmt.Errorf("Invalid public key bytes: point not on curve.")
     }
 
@@ -142,33 +172,4 @@ func (pub *PublicKey) FromBytes(koblitzcurve curve.KoblitzCurve, b []byte) (err 
   }
 
   return nil
-}
-/* Decompress decompresses coordinate x and ylsb (y's least significant bit)
-and returns the value of y
-source: https://github.com/btcsuite/btcd/blob/807d344fe97072efdf38ac3df053e07f26187a4f/btcec/pubkey.go#L27 */
-func (curve *KoblitzCurve) Decompress(x *big.Int, ybit bool) (*big.Int, error) {
-  // TODO: This will probably only work for secp256k1 due to
-	// optimizations.
-
-	// Y = +-sqrt(x^3 + B)
-	x3 := new(big.Int).Mul(x, x)
-	x3.Mul(x3, x)
-	x3.Add(x3, curve.Params().B)
-
-	// now calculate sqrt mod p of x2 + B
-	// This code used to do a full sqrt based on tonelli/shanks,
-	// but this was replaced by the algorithms referenced in
-	// https://bitcointalk.org/index.php?topic=162805.msg1712294#msg1712294
-	y := new(big.Int).Exp(x3, curve.QPlus1Div4(), curve.Params().P)
-
-	if ybit != isOdd(y) {
-		y.Sub(curve.Params().P, y)
-	}
-	if ybit != isOdd(y) {
-		return nil, fmt.Errorf("ybit doesn't match oddness")
-	}
-
-  // TODO: It is necessary to verify with IsOnCurve(x, y) or ParsePubKey ?
-
-	return y, nil  // TODO return struct Point (x, y)
 }

@@ -4,6 +4,9 @@ import (
 	"fmt"
   "bytes"
   "math/big"
+	"crypto/rand"
+  "crypto/ecdsa"
+	"crypto/elliptic"
 )
 
 type PrivateKey ecdsa.PrivateKey
@@ -37,7 +40,7 @@ func (priv *PrivateKey) FromBytes(b []byte) (err error) {
   priv.D = new(big.Int).SetBytes(b)
 
   /* Public returns the public key corresponding to priv.  */
-  priv.Public() // TODO: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
+  //priv.Public() // TODO: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
 
   return nil
 }
@@ -98,7 +101,7 @@ func (priv *PrivateKey) FromWIF(wif string) (err error) {
   }
 
   /* Derive public key from private key */
-  priv.Public() // TODO: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
+  //priv.Public() // TODO: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
 
   return nil
 }

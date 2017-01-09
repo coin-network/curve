@@ -5,6 +5,7 @@ import (
   "bytes"
   "crypto/sha256"
   "math/big"
+	"strings"
 )
 
 // encodes a byte slice b into a base-58 encoded string
