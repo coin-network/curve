@@ -1,6 +1,6 @@
-// Copyright (c) 2014-2015 The btcsuite developers
-// Use of this source code is governed by an ISC
-// license that can be found in the LICENSE file.
+// Copyright (c) 2014-2016 The btcsuite developers
+// Copyright 2017 The coin-network developers
+// License: MIT
 
 // This file is ignored during the regular build due to the following build tag.
 // This build tag is set during go generate.

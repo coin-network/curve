@@ -1,6 +1,6 @@
-// Copyright (c) 2015 The btcsuite developers
-// Use of this source code is governed by an ISC
-// license that can be found in the LICENSE file.
+// Copyright (c) 2016 The btcsuite developers
+// Copyright 2017 The coin-network developers
+// License: MIT
 
 package curve
 

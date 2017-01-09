@@ -1,3 +1,7 @@
+// Copyright 2016 Ivan (Vanya) A. Sergeev (https://github.com/vsergeev)
+// Copyright 2017 The coin-network developers
+// License: MIT
+
 package curve
 
 import (
@@ -8,7 +12,7 @@ import (
 	"strings"
 )
 
-// encodes a byte slice b into a base-58 encoded string
+// b58encode encodes a byte slice b into a base-58 encoded string
 func b58encode(b []byte) (s string) {
 	/* See https://en.bitcoin.it/wiki/Base58Check_encoding */
 
@@ -34,7 +38,7 @@ func b58encode(b []byte) (s string) {
 	return s
 }
 
-// decodes a base-58 encoded string into a byte slice b.
+// b58decode decodes a base-58 encoded string into a byte slice b.
 func b58decode(s string) (b []byte, err error) {
 	/* See https://en.bitcoin.it/wiki/Base58Check_encoding */
 
@@ -61,7 +65,7 @@ func b58decode(s string) (b []byte, err error) {
 	return b, nil
 }
 
-// encodes version ver and byte slice b into a base-58 check encoded string.
+// b58checkencode encodes version ver and byte slice b into a base-58 check encoded string.
 func b58checkencode(ver uint8, b []byte) (s string) {
 	/* Prepend version */
 	bcpy := append([]byte{ver}, b...)
@@ -96,7 +100,7 @@ func b58checkencode(ver uint8, b []byte) (s string) {
 	return s
 }
 
-// decodes base-58 check encoded string s into a version ver and byte slice b.
+// b58checkdecode decodes base-58 check encoded string s into a version ver and byte slice b.
 func b58checkdecode(s string) (ver uint8, b []byte, err error) {
 	/* Decode base58 string */
 	b, err = b58decode(s)

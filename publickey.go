@@ -1,3 +1,7 @@
+// Copyright 2016 Ivan (Vanya) A. Sergeev (https://github.com/vsergeev)
+// Copyright 2017 The coin-network developers
+// License: MIT
+
 package curve
 
 import (
@@ -14,6 +18,7 @@ type PublicKey ecdsa.PublicKey
 func isOdd(a *big.Int) bool {
 	return a.Bit(0) == 1
 }
+
 /* DecompressPoint decompresses coordinate x and ylsb (y's least significant bit)
 and returns the value of y
 source: https://github.com/btcsuite/btcd/blob/807d344fe97072efdf38ac3df053e07f26187a4f/btcec/pubkey.go#L27 */
@@ -49,7 +54,7 @@ func (p *PublicKey) ToECDSA() *ecdsa.PublicKey {
 	return (*ecdsa.PublicKey)(p)
 }
 
-// converts a public key to an uncompressed address string.
+// ToAddressUncompressed converts a public key to an uncompressed address string.
 func (pub *PublicKey) ToAddressUncompressed() (address string) {
 
   /* Convert the public key to bytes */
@@ -72,7 +77,8 @@ func (pub *PublicKey) ToAddressUncompressed() (address string) {
 
   return address
 }
-// converts a public key to a compressed address string.
+
+// ToAddress converts a public key to a compressed address string.
 func (pub *PublicKey) ToAddress() (address string) {
   /* See https://en.bitcoin.it/w/images/en/9/9b/PubKeyToAddr.png */
 
@@ -96,7 +102,8 @@ func (pub *PublicKey) ToAddress() (address string) {
 
   return address
 }
-// converts a public key to a 33-byte byte slice with point compression.
+
+// ToBytes converts a public key to a 33-byte byte slice with point compression.
 func (pub *PublicKey) ToBytes() (b []byte) {
   /* See Certicom SEC1 2.3.3, pg. 10 */
 
@@ -112,7 +119,8 @@ func (pub *PublicKey) ToBytes() (b []byte) {
 
   return append([]byte{0x03}, padded_x...)
 }
-// converts a public key to a 65-byte byte slice without point compression.
+
+// ToBytesUncompressed converts a public key to a 65-byte byte slice without point compression.
 func (pub *PublicKey) ToBytesUncompressed() (b []byte) {
   /* See Certicom SEC1 2.3.3, pg. 10 */
 
@@ -126,7 +134,9 @@ func (pub *PublicKey) ToBytesUncompressed() (b []byte) {
   /* Add prefix 0x04 for uncompressed coordinates */
   return append([]byte{0x04}, append(padded_x, padded_y...)...)
 }
-// TODO: :NOTUSE: converts a byte slice (either with or without point compression) to a public key.
+
+// TODO: Where is it used and what is it used for?
+// FromBytes converts a byte slice (either with or without point compression) to a public key.
 func (pub *PublicKey) FromBytes(koblitzcurve *KoblitzCurve, b []byte) (err error) {
   /* See Certicom SEC1 2.3.4, pg. 11 */
 
@@ -141,11 +151,11 @@ func (pub *PublicKey) FromBytes(koblitzcurve *KoblitzCurve, b []byte) (err error
       return fmt.Errorf("Invalid public key bytes length %d, expected 33.", len(b))
     }
 
-    // TODO: TEST
+    // TODO: Is OK ?
     pub.X = new(big.Int).SetBytes(b[1:33])
 
     ybit := false
-
+    // TODO: This question is correct ?
     if uint(b[0]&0x1) == 1 {
       ybit = true
     }
@@ -168,7 +178,7 @@ func (pub *PublicKey) FromBytes(koblitzcurve *KoblitzCurve, b []byte) (err error
     pub.X = new(big.Int).SetBytes(b[1:33])
     pub.Y = new(big.Int).SetBytes(b[33:65])
 
-    /* ??? Check that the point is on the curve */
+    /* Check that the point is on the curve */
     if !koblitzcurve.IsOnCurve(pub.X, pub.Y) {
       return fmt.Errorf("Invalid public key bytes: point not on curve.")
     }

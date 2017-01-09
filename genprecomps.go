@@ -1,6 +1,6 @@
-// Copyright 2015 The btcsuite developers
-// Use of this source code is governed by an ISC
-// license that can be found in the LICENSE file.
+// Copyright 2015-2016 The btcsuite developers
+// Copyright 2017 The coin-network developers
+// License: MIT
 
 // This file is ignored during the regular build due to the following build tag.
 // It is called by go generate and used to automatically generate pre-computed
@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"github.com/coin-network/curve"
 )
 
@@ -41,9 +40,9 @@ func main() {
 	encoded := make([]byte, base64.StdEncoding.EncodedLen(compressed.Len()))
 	base64.StdEncoding.Encode(encoded, compressed.Bytes())
 
-	fmt.Fprintln(fi, "// Copyright (c) 2015 The btcsuite developers")
-	fmt.Fprintln(fi, "// Use of this source code is governed by an ISC")
-	fmt.Fprintln(fi, "// license that can be found in the LICENSE file.")
+	fmt.Fprintln(fi, "// Copyright (c) 2016 The btcsuite developers")
+	fmt.Fprintln(fi, "// Copyright 2017 The coin-network developers")
+	fmt.Fprintln(fi, "// License: MIT")
 	fmt.Fprintln(fi)
 	fmt.Fprintln(fi, "package curve")
 	fmt.Fprintln(fi)

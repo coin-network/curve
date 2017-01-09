@@ -1,3 +1,7 @@
+// Copyright 2016 Ivan (Vanya) A. Sergeev (https://github.com/vsergeev)
+// Copyright 2017 The coin-network developers
+// License: MIT
+
 package curve
 
 import (
@@ -41,7 +45,7 @@ func (p *PrivateKey) Sign(hash []byte) (*Signature, error) {
 	return signRFC6979(p, hash)
 }
 
-// converts a Bitcoin private key to a 32-byte byte slice.
+// ToBytes converts a Bitcoin private key to a 32-byte byte slice.
 func (priv *PrivateKey) ToBytes() (b []byte) {
   d := priv.D.Bytes()
 
@@ -50,7 +54,8 @@ func (priv *PrivateKey) ToBytes() (b []byte) {
 
   return padded_d
 }
-// FIXME converts a 32-byte byte slice to a Bitcoin private key and derives the corresponding public key.
+
+// FromBytes converts a 32-byte byte slice to a Bitcoin private key and derives the corresponding public key.
 func (priv *PrivateKey) FromBytes(b []byte) (err error) {
 
   if len(b) != 32 {
@@ -60,11 +65,12 @@ func (priv *PrivateKey) FromBytes(b []byte) (err error) {
   priv.D = new(big.Int).SetBytes(b)
 
   /* Public returns the public key corresponding to priv.  */
-  //priv.Public() // TODO: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
+  //priv.Public() // FIXME: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
 
   return nil
 }
-// converts a Bitcoin private key to a Wallet Import Format string.
+
+// ToWIF converts a Bitcoin private key to a Wallet Import Format string.
 func (priv *PrivateKey) ToWIF() (wif string) {
   /* See https://en.bitcoin.it/wiki/Wallet_import_format */
 
@@ -76,7 +82,8 @@ func (priv *PrivateKey) ToWIF() (wif string) {
 
   return wif
 }
-// converts a private key to a Wallet Import Format string with the public key compressed flag.
+
+// ToWIFC converts a private key to a Wallet Import Format string with the public key compressed flag.
 func (priv *PrivateKey) ToWIFC() (wifc string) {
   /* See https://en.bitcoin.it/wiki/Wallet_import_format */
 
@@ -91,7 +98,8 @@ func (priv *PrivateKey) ToWIFC() (wifc string) {
 
   return wifc
 }
-// FIXME converts a Wallet Import Format string to a Bitcoin private key and derives the corresponding public key.
+
+// FromWIF converts a Wallet Import Format string to a Bitcoin private key and derives the corresponding public key.
 func (priv *PrivateKey) FromWIF(wif string) (err error) {
   /* See https://en.bitcoin.it/wiki/Wallet_import_format */
 
@@ -125,7 +133,8 @@ func (priv *PrivateKey) FromWIF(wif string) (err error) {
 
   return nil
 }
-// checks that string wif is a valid Wallet Import Format or Wallet Import Format Compressed string. If it is not, err is populated with the reason.
+
+// CheckWIF checks that string wif is a valid Wallet Import Format or Wallet Import Format Compressed string. If it is not, err is populated with the reason.
 func CheckWIF(wif string) (valid bool, err error) {
 	/* See https://en.bitcoin.it/wiki/Wallet_import_format */
 
