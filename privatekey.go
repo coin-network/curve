@@ -65,7 +65,7 @@ func (priv *PrivateKey) FromBytes(b []byte) (err error) {
   priv.D = new(big.Int).SetBytes(b)
 
   /* Public returns the public key corresponding to priv.  */
-  //priv.Public() // FIXME: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
+  //priv.Public() // TODO: ?? priv.derive() see: https://github.com/vsergeev/btckeygenie/blob/master/btckey/btckey.go#L48
 
   return nil
 }
