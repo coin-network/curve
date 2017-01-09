@@ -14,10 +14,10 @@ type PublicKey ecdsa.PublicKey
 func isOdd(a *big.Int) bool {
 	return a.Bit(0) == 1
 }
-/* Decompress decompresses coordinate x and ylsb (y's least significant bit)
+/* DecompressPoint decompresses coordinate x and ylsb (y's least significant bit)
 and returns the value of y
 source: https://github.com/btcsuite/btcd/blob/807d344fe97072efdf38ac3df053e07f26187a4f/btcec/pubkey.go#L27 */
-func (curve *KoblitzCurve) Decompress(x *big.Int, ybit bool) (*big.Int, error) {
+func (curve *KoblitzCurve) DecompressPoint(x *big.Int, ybit bool) (*big.Int, error) {
   // TODO: This will probably only work for secp256k1 due to
 	// optimizations.
 
@@ -43,6 +43,12 @@ func (curve *KoblitzCurve) Decompress(x *big.Int, ybit bool) (*big.Int, error) {
 
 	return y, nil  // TODO return struct Point (x, y)
 }
+
+// ToECDSA returns the public key as a *ecdsa.PublicKey.
+func (p *PublicKey) ToECDSA() *ecdsa.PublicKey {
+	return (*ecdsa.PublicKey)(p)
+}
+
 // converts a public key to an uncompressed address string.
 func (pub *PublicKey) ToAddressUncompressed() (address string) {
 
@@ -144,7 +150,7 @@ func (pub *PublicKey) FromBytes(koblitzcurve *KoblitzCurve, b []byte) (err error
       ybit = true
     }
 
-    Y, err := koblitzcurve.Decompress(new(big.Int).SetBytes(b[1:33]), ybit)
+    Y, err := koblitzcurve.DecompressPoint(new(big.Int).SetBytes(b[1:33]), ybit)
 
     if err != nil {
       return fmt.Errorf("Invalid compressed public key bytes, decompression error: %v", err)

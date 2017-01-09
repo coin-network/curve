@@ -10,6 +10,7 @@ import (
 )
 
 type PrivateKey ecdsa.PrivateKey
+
 // GenerateKey generate PublicKey/PrivateKey from KoblitzCurve
 func NewPrivateKey(koblitzcurve elliptic.Curve) (*PrivateKey, error) {
 
@@ -21,6 +22,25 @@ func NewPrivateKey(koblitzcurve elliptic.Curve) (*PrivateKey, error) {
 	}
 	return (*PrivateKey)(privkeyCurve), nil
 }
+
+// PubKey returns the PublicKey corresponding to this private key.
+func (p *PrivateKey) PubKey() *PublicKey {
+	return (*PublicKey)(&p.PublicKey)
+}
+
+// ToECDSA returns the private key as a *ecdsa.PrivateKey.
+func (p *PrivateKey) ToECDSA() *ecdsa.PrivateKey {
+	return (*ecdsa.PrivateKey)(p)
+}
+
+// Sign generates an ECDSA signature for the provided hash (which should be the result
+// of hashing a larger message) using the private key. Produced signature
+// is deterministic (same message and same key yield the same signature) and canonical
+// in accordance with RFC6979 and BIP0062.
+func (p *PrivateKey) Sign(hash []byte) (*Signature, error) {
+	return signRFC6979(p, hash)
+}
+
 // converts a Bitcoin private key to a 32-byte byte slice.
 func (priv *PrivateKey) ToBytes() (b []byte) {
   d := priv.D.Bytes()
